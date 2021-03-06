@@ -11,5 +11,15 @@ module.exports = {
         views: '@/views'
       }
     }
+  },
+  css: {
+    loaderOptions: {
+      sass: {
+        prependData: '@import "~@/assets/css/base.scss";'
+      },
+      scss: {
+        prependData: '@import "~@/assets/css/base.scss";'
+      }
+    }
   }
 }
