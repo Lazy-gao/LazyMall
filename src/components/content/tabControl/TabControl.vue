@@ -20,6 +20,7 @@ export default {
   },
   data () {
     return {
+      // 记录当前谁被选中
       currentIndex: 0
     }
   },
@@ -35,7 +36,6 @@ export default {
 <style scoped lang="scss">
 .tab-control {
   display: flex;
-  margin-top: 10px;
   text-align: center;
 
   .tab-control-item {
