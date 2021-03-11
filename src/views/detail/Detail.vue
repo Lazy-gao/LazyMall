@@ -1,24 +1,30 @@
 <template>
   <div id="detail-info">
-    <detail-nav-bar class="detail-nav"></detail-nav-bar>
+    <detail-nav-bar class="detail-nav" @titleClick="titleClick" ref="detailNav"></detail-nav-bar>
 
     <scroll class="content"
             ref="scroll"
             :probe-type="3"
-            :pull-up-load="true">
+            :pull-up-load="true"
+            @scroll="contentScroll">
       <detail-swiper :top-images="topImages"></detail-swiper>
 
       <detail-base-info :goods="goods"></detail-base-info>
 
-      <detail-comment-info></detail-comment-info>
+      <detail-comment-info :comment-info="commentInfo" ref="comment"></detail-comment-info>
 
       <detail-shop-info :shop="shop"></detail-shop-info>
 
       <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad"></detail-goods-info>
 
-      <detail-param-info :param-info="paramInfo"></detail-param-info>
+      <detail-param-info :param-info="paramInfo" ref="param"></detail-param-info>
 
+      <goods-list :goods="recommend" ref="recommend"></goods-list>
     </scroll>
+
+    <back-top @click.native="backTopClick" v-show="isShowBackTop"></back-top>
+
+    <detail-bottom-bar @addToCart="addToCart"></detail-bottom-bar>
 
   </div>
 </template>
@@ -31,8 +37,11 @@ import DetailCommentInfo from 'views/detail/detailChildren/DetailCommentInfo'
 import DetailShopInfo from 'views/detail/detailChildren/DetailShopInfo'
 import DetailGoodsInfo from 'views/detail/detailChildren/DetailGoodsInfo'
 import DetailParamInfo from 'views/detail/detailChildren/DetailParamInfo'
+import GoodsList from 'components/content/goods/GoodsList'
 import Scroll from 'components/common/scroll/Scroll'
-import { getDetail, GoodsInfo, Shop, GoodsParam } from 'request/detail'
+import DetailBottomBar from 'views/detail/detailChildren/DetailBottomBar'
+import { getDetail, GoodsInfo, Shop, GoodsParam, getRecommend } from 'request/detail'
+import { itemListenerMixin, backTopMixin } from 'common/mixin'
 
 export default {
   name: 'Detail',
@@ -44,8 +53,11 @@ export default {
     DetailShopInfo,
     DetailGoodsInfo,
     DetailParamInfo,
-    Scroll
+    Scroll,
+    DetailBottomBar,
+    GoodsList
   },
+  mixins: [itemListenerMixin, backTopMixin],
   data () {
     return {
       iid: null,
@@ -54,21 +66,24 @@ export default {
       shop: {},
       detailInfo: {},
       paramInfo: {},
-      commentInfo: {}
+      commentInfo: {},
+      recommend: [],
+      themeTopY: [],
+      currentIndex: 0
     }
   },
   created () {
     // 保存跳转路由时携带过来的商品id
     this.iid = this.$route.query.iid
     this.getDetail(this.iid)
-    this.$nextTick(() => {
-      console.log(this.$refs.scroll)
-    })
+    this.getRecommend()
+  },
+  destroyed () {
+    this.$bus.$off('itemImageLoad', this.itemImgListener)
   },
   methods: {
     getDetail (iid) {
       getDetail(iid).then(res => {
-        console.log(res)
         const data = res.result
 
         // 1.获取轮播图数据
@@ -78,7 +93,9 @@ export default {
         this.goods = new GoodsInfo(data.itemInfo, data.columns, data.shopInfo.services)
 
         // 3.获取评论信息
-        this.commentInfo = data.rate.list[0]
+        if (data.rate.cRate !== 0) {
+          this.commentInfo = data.rate
+        }
 
         // 4.获取店铺信息
         this.shop = new Shop(data.shopInfo)
@@ -91,8 +108,40 @@ export default {
       })
     },
     imageLoad () {
+      // 图片加载完后重新计算高度
       this.$refs.scroll.refresh()
-    }
+
+      // 获取元素的offsetTop值
+      this.themeTopY = []
+
+      this.themeTopY.push(0)
+      this.themeTopY.push(this.$refs.comment.$el.offsetTop)
+      this.themeTopY.push(this.$refs.param.$el.offsetTop)
+      this.themeTopY.push(this.$refs.recommend.$el.offsetTop)
+    },
+    getRecommend () {
+      getRecommend().then((res) => {
+        this.recommend = res.data.list
+      })
+    },
+    titleClick (index) {
+      this.$refs.scroll.scrollTo(0, -this.themeTopY[index], 500)
+    },
+    contentScroll (position) {
+      // 判断backTop是否显式
+      this.isShowBackTop = -(position.y) > 1000
+
+      const positionY = -position.y
+
+      const length = this.themeTopY.length
+      for (let i = 0; i < length; i++) {
+        if (this.currentIndex !== i && ((i < length - 1 && positionY >= this.themeTopY[i] && positionY < this.themeTopY[i + 1]) || (i === length - 1 && positionY >= this.themeTopY[i]))) {
+          this.currentIndex = i
+          this.$refs.detailNav.currentIndex = this.currentIndex
+        }
+      }
+    },
+    addToCart () {}
   }
 }
 </script>
@@ -118,7 +167,7 @@ export default {
 
     position: absolute;
     top: 44px;
-    bottom: 0;
+    bottom: 50px;
     left: 0;
     right: 0;
     overflow: hidden;

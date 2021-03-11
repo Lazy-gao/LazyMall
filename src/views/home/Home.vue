@@ -48,7 +48,7 @@ import GoodsList from 'components/content/goods/GoodsList'
 import Scroll from 'components/common/scroll/Scroll'
 import BackTop from 'components/content/backTop/BackTop'
 import { getHomeMultidata, getHomeGoods } from 'request/home'
-import { debounce } from 'common/utils'
+import { itemListenerMixin, backTopMixin } from 'common/mixin'
 
 export default {
   name: 'Home',
@@ -62,6 +62,7 @@ export default {
     Scroll,
     BackTop
   },
+  mixins: [itemListenerMixin, backTopMixin],
   data () {
     return {
       banners: [],
@@ -72,7 +73,6 @@ export default {
         sell: { page: 0, list: [] }
       },
       currentType: 'pop',
-      isShowBackTop: false,
       tabControlOffsetTop: 0,
       isTabFixed: false,
       saveY: 0
@@ -84,19 +84,6 @@ export default {
     this.getHomeGoods('pop')
     this.getHomeGoods('new')
     this.getHomeGoods('sell')
-  },
-  mounted () {
-    this.$nextTick(() => {
-      // 利用防抖函数来进行限制每张图片都要刷新一次的次数
-      const refresh = debounce(this.$refs.scroll.refresh, 500)
-
-      // 监听item中图片的加载完成
-      // 利用事件总线机制来监听图片的加载完成，等图片加载完成时进行重新计算可滚动区域的高度
-      this.$bus.$on('itemImageLoad', () => {
-        // 重新计算可滚动区域的高度是调用 BScroll 中的 refresh()方法
-        refresh()
-      })
-    })
   },
   methods: {
     getHomeMultidata () {
@@ -132,10 +119,6 @@ export default {
       this.$refs.tabControl1.currentIndex = index
       this.$refs.tabControl2.currentIndex = index
     },
-    backTopClick () {
-      // 访问组件对象中的scrollTo方法，
-      this.$refs.scroll.scrollTo(0, 0)
-    },
     contentScroll (position) {
       // 判断backTop是否显式
       this.isShowBackTop = -(position.y) > 1000
@@ -158,6 +141,7 @@ export default {
   },
   deactivated () {
     this.saveY = this.$refs.scroll.getScrollY()
+    this.$bus.$off('itemImageLoad', this.itemImgListener)
   }
 }
 </script>

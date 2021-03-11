@@ -28,6 +28,7 @@ export default {
     }
   },
   methods: {
+    // 监听商品详情图片的加载
     imageLoad () {
       // 判断所有图片都加载完成了，最后进行一次回调即可
       if (++this.counter === this.imagesLength) {
@@ -47,7 +48,7 @@ export default {
 <style scoped>
 .goods-info {
   padding: 20px 0;
-  border-bottom: 5px solid #f2f5f8;
+  border-bottom: 8px solid #eaeaea;
 }
 
 .info-desc {

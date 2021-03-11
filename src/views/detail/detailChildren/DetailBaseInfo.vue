@@ -49,18 +49,18 @@ export default {
 <style scoped lang="scss">
 .detail-baseInfo {
   margin-top: 15px;
-  padding: 0 8px;
   color: #999;
 
   .info-title {
     text-align: left;
     line-height: 24px;
+    padding: 0 8px;
     color: #333;
   }
 
   .info-price {
     margin-top: 10px;
-    padding-bottom: 10px;
+    padding: 0 8px 10px 8px;
     border-bottom: 8px solid #eaeaea;
 
     .newPrice {
@@ -90,7 +90,7 @@ export default {
     justify-content: space-between;
     margin-top: 15px;
     line-height: 30px;
-    padding-bottom: 10px;
+    padding: 0 8px 10px 8px;
     border-bottom: 8px solid #eaeaea;
     font-size: 13px;
 
@@ -109,7 +109,7 @@ export default {
     margin-top: 15px;
     line-height: 30px;
     font-size: 13px;
-    padding-bottom: 10px;
+    padding: 0 8px 10px 8px;
     border-bottom: 8px solid #eaeaea;
 
     .info-service-item {
@@ -126,7 +126,7 @@ export default {
     display: flex;
     justify-content: space-between;
     margin-top: 15px;
-    padding-bottom: 10px;
+    padding: 0 8px 10px 8px;
     border-bottom: 8px solid #eaeaea;
 
     .text {

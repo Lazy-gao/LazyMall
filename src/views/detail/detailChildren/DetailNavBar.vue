@@ -33,9 +33,12 @@ export default {
   components: {
     NavBar
   },
+  props: {
+
+  },
   data () {
     return {
-      title: ['商品', '参数', '评论', '推荐'],
+      title: ['商品', '评论', '参数', '推荐'],
       currentIndex: 0
     }
   },
@@ -45,6 +48,7 @@ export default {
     },
     titleClick (index) {
       this.currentIndex = index
+      this.$emit('titleClick', index)
     }
   }
 }
@@ -63,6 +67,7 @@ export default {
 
     .title-item {
       flex: 1;
+
       span {
         padding: 5px;
       }
