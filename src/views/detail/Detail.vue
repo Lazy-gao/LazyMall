@@ -8,6 +8,7 @@
             :pull-up-load="true"
             @scroll="contentScroll">
       <detail-swiper :top-images="topImages"></detail-swiper>
+      <back-cart class="back-cart" @click.native="backToCart"></back-cart>
 
       <detail-base-info :goods="goods"></detail-base-info>
 
@@ -40,6 +41,7 @@ import DetailParamInfo from 'views/detail/detailChildren/DetailParamInfo'
 import GoodsList from 'components/content/goods/GoodsList'
 import Scroll from 'components/common/scroll/Scroll'
 import DetailBottomBar from 'views/detail/detailChildren/DetailBottomBar'
+import BackCart from 'components/content/backCart/BackCart'
 import { getDetail, GoodsInfo, Shop, GoodsParam, getRecommend } from 'request/detail'
 import { itemListenerMixin, backTopMixin } from 'common/mixin'
 
@@ -55,7 +57,8 @@ export default {
     DetailParamInfo,
     Scroll,
     DetailBottomBar,
-    GoodsList
+    GoodsList,
+    BackCart
   },
   mixins: [itemListenerMixin, backTopMixin],
   data () {
@@ -84,6 +87,7 @@ export default {
   methods: {
     getDetail (iid) {
       getDetail(iid).then(res => {
+        console.log(res)
         const data = res.result
 
         // 1.获取轮播图数据
@@ -141,7 +145,24 @@ export default {
         }
       }
     },
-    addToCart () {}
+    addToCart () {
+      // 1.获取购物车需要展示的信息
+      const product = {}
+      product.image = this.topImages[0]
+      product.title = this.goods.title
+      product.desc = this.goods.desc
+      product.price = this.goods.realPrice
+      product.style = this.commentInfo.list[0].style
+      product.name = this.shop.name
+      product.iid = this.iid
+
+      // 2.将商品添加到购物车
+      // 2.1 将商品信息添加到Vuex中的state中进行保存，
+      this.$store.dispatch('addCart', product)
+    },
+    backToCart () {
+      this.$router.push('/cart')
+    }
   }
 }
 </script>
@@ -171,6 +192,12 @@ export default {
     left: 0;
     right: 0;
     overflow: hidden;
+
+    //.back-cart {
+    //  position: fixed;
+    //  top: 5px;
+    //  right: 5px;
+    //}
   }
 }
 </style>
