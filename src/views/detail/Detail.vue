@@ -24,6 +24,7 @@
     </scroll>
 
     <back-top @click.native="backTopClick" v-show="isShowBackTop"></back-top>
+    <!--    <toast :message="message" :show="show"></toast>-->
 
     <detail-bottom-bar @addToCart="addToCart"></detail-bottom-bar>
 
@@ -45,6 +46,8 @@ import BackCart from 'components/content/backCart/BackCart'
 import { getDetail, GoodsInfo, Shop, GoodsParam, getRecommend } from 'request/detail'
 import { itemListenerMixin, backTopMixin } from 'common/mixin'
 
+// import Toast from '@/components/common/toast/Toast'
+
 export default {
   name: 'Detail',
   components: {
@@ -59,6 +62,7 @@ export default {
     DetailBottomBar,
     GoodsList,
     BackCart
+    // Toast
   },
   mixins: [itemListenerMixin, backTopMixin],
   data () {
@@ -73,6 +77,8 @@ export default {
       recommend: [],
       themeTopY: [],
       currentIndex: 0
+      // message: '',
+      // show: false
     }
   },
   created () {
@@ -158,7 +164,16 @@ export default {
 
       // 2.将商品添加到购物车
       // 2.1 将商品信息添加到Vuex中的state中进行保存，
-      this.$store.dispatch('addCart', product)
+      this.$store.dispatch('addCart', product).then(res => {
+        // this.show = true
+        // this.message = res
+        // setTimeout(() => {
+        //   this.show = false
+        //   this.message = ''
+        // }, 2000)
+
+        this.$toast.showToast(res, 2000)
+      })
     },
     backToCart () {
       this.$router.push('/cart')

@@ -8,7 +8,7 @@
       <div class="ui-save-price">
         {{ totalPrice | showPrice }}
       </div>
-      <div class="ui-checkout-btn">结算</div>
+      <div class="ui-checkout-btn" @click="account">结算</div>
     </div>
   </div>
 </template>
@@ -48,6 +48,11 @@ export default {
           item.checked = true
         })
       }
+    },
+    account () {
+      if (!this.isSelectAll) {
+        this.$toast.showToast('请先选中商品哦', 'rgba(225, 42, 82, .7)')
+      }
     }
   }
 }
@@ -63,7 +68,7 @@ export default {
   padding: 10px 15px;
   border-top: 1px solid #d8d8d8;
   background: #fefefe;
-  z-index: 9;
+  z-index: 10;
 
   .checkout-checkbox {
     display: inline-block;
